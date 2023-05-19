@@ -46,7 +46,7 @@ public class PlayerInputController : MonoBehaviour
     public LayerMask groundLayers => GroundLayers;
 
     [Header("Player Covered")]
-    [SerializeField] private bool covered = true;
+    [SerializeField] private bool covered = false;
     public bool Covered { get { return covered; } set { covered = value; } }
     [SerializeField] private float coveredOffset = -0.75f;
     public float CoveredOffset => coveredOffset;
