@@ -23,8 +23,6 @@ public class PlayerInputController : MonoBehaviour
     [SerializeField] private float crounchHeight = 1.0f;
     public float CrounchHeight => crounchHeight;
 
-
-
     [Space(10)]
     [SerializeField] private float jumpHeight = 1.2f;
     public float JumpHeight => jumpHeight;
@@ -47,6 +45,7 @@ public class PlayerInputController : MonoBehaviour
     [SerializeField] private LayerMask GroundLayers;
     public LayerMask groundLayers => GroundLayers;
 
+    [Header("Player Covered")]
     [SerializeField] private bool covered = true;
     public bool Covered { get { return covered; } set { covered = value; } }
     [SerializeField] private float coveredOffset = -0.75f;
@@ -137,8 +136,7 @@ public class PlayerInputController : MonoBehaviour
     void Move()
     {
         //set target speed based on move speed, sprint speed and if sprint is pressed
-        float targetSpeed = _playerActions.Sprint ? SprintSpeed : MoveSpeed;
-        targetSpeed = _playerActions.Crounch ? CrounchSpeed : MoveSpeed;
+        float targetSpeed = _playerActions.Sprint ? SprintSpeed : _playerActions.Crounch ? CrounchSpeed + 0.1f : MoveSpeed;
 
         //a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
@@ -276,12 +274,12 @@ public class PlayerInputController : MonoBehaviour
 
         if (Covered)
         {
-            Gizmos.color = transparentBlue;
+            Gizmos.color = transparentRed;
             Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - CoveredOffset, transform.position.z), CoveredRadius);
         }
         else
         {
-            Gizmos.color = transparentRed;
+            Gizmos.color = transparentBlue;
             Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - CoveredOffset, transform.position.z), CoveredRadius);
         }
     }
