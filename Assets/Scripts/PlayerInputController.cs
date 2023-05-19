@@ -10,10 +10,20 @@ public class PlayerInputController : MonoBehaviour
     public float MoveSpeed { get { return moveSpeed; } set { moveSpeed = value; } }
     [SerializeField] private float sprintSpeed = 6.0f;
     public float SprintSpeed { get { return sprintSpeed; } set { sprintSpeed = value; } }
+    [SerializeField] private float crounchSpeed = 2.0f;
+    public float CrounchSpeed { get { return crounchSpeed; } set { crounchSpeed = value; } }
     [SerializeField] private float rotationSpeed = 1.0f;
     public float RotationSpeed => rotationSpeed;
     [SerializeField] private float speedChangeRate = 10.0f;
     public float SpeedChangeRate => speedChangeRate;
+
+    [Space(10)]
+    [SerializeField] private float height = 2.0f;
+    public float Height => height;
+    [SerializeField] private float crounchHeight = 1.0f;
+    public float CrounchHeight => crounchHeight;
+
+
 
     [Space(10)]
     [SerializeField] private float jumpHeight = 1.2f;
@@ -30,12 +40,21 @@ public class PlayerInputController : MonoBehaviour
     [Header("Player Grounded")]
     [SerializeField] private bool grounded = true;
     public bool Grounded { get { return grounded; } set { grounded = value; } }
-    [SerializeField] private float groundedOffset = -0.14f;
+    [SerializeField] private float groundedOffset = 0.75f;
     public float GroundedOffset => groundedOffset;
     [SerializeField] private float GroundedRadius = 0.5f;
     public float groundedRadius => GroundedRadius;
     [SerializeField] private LayerMask GroundLayers;
     public LayerMask groundLayers => GroundLayers;
+
+    [SerializeField] private bool covered = true;
+    public bool Covered { get { return covered; } set { covered = value; } }
+    [SerializeField] private float coveredOffset = -0.75f;
+    public float CoveredOffset => coveredOffset;
+    [SerializeField] private float coveredRadius = 0.5f;
+    public float CoveredRadius => coveredRadius;
+    [SerializeField] private LayerMask coverLayers;
+    public LayerMask CoverLayers => coverLayers;
 
     [Header("Cinemachine")]
     [SerializeField] private GameObject cinemachineTarget;
@@ -84,6 +103,8 @@ public class PlayerInputController : MonoBehaviour
     {
         JumpAndGravity();
         GroundedCheck();
+        CoveredCheck();
+        Crounch();
         Move();
     }
 
@@ -117,6 +138,7 @@ public class PlayerInputController : MonoBehaviour
     {
         //set target speed based on move speed, sprint speed and if sprint is pressed
         float targetSpeed = _playerActions.Sprint ? SprintSpeed : MoveSpeed;
+        targetSpeed = _playerActions.Crounch ? CrounchSpeed : MoveSpeed;
 
         //a simplistic acceleration and deceleration designed to be easy to remove, replace, or iterate upon
 
@@ -159,6 +181,12 @@ public class PlayerInputController : MonoBehaviour
 
         //move the player
         _playerCC.Move(inputDirection.normalized * (_speed * Time.deltaTime) + new Vector3(0.0f, _verticalVelocity, 0.0f) * Time.deltaTime);
+    }
+
+    private void Crounch()
+    {
+        _playerCC.height = _playerActions.Crounch ? CrounchHeight : Covered ? CrounchHeight : Height;
+        // _playerCC.center = _playerActions.Crounch ? CrounchHeight*.5f : Height*.5f;
     }
 
     private void JumpAndGravity()
@@ -215,6 +243,12 @@ public class PlayerInputController : MonoBehaviour
         Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z);
         Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers, QueryTriggerInteraction.Ignore);
     }
+    private void CoveredCheck()
+    {
+        // set sphere position, with offset
+        Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - CoveredOffset, transform.position.z);
+        Covered = Physics.CheckSphere(spherePosition, CoveredRadius, CoverLayers, QueryTriggerInteraction.Ignore);
+    }
 
     private static float ClampAngle(float lfAngle, float lfMin, float lfMax)
     {
@@ -226,12 +260,29 @@ public class PlayerInputController : MonoBehaviour
     private void OnDrawGizmosSelected()
     {
         Color transparentGreen = new Color(0.0f, 1.0f, 0.0f, 0.35f);
+        Color transparentBlue = new Color(0.0f, 0.0f, 1.0f, 0.35f);
         Color transparentRed = new Color(1.0f, 0.0f, 0.0f, 0.35f);
 
-        if (Grounded) Gizmos.color = transparentGreen;
-        else Gizmos.color = transparentRed;
+        if (Grounded)
+        {
+            Gizmos.color = transparentGreen;
+            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
+        }
+        else
+        {
+            Gizmos.color = transparentRed;
+            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
+        }
 
-        // when selected, draw a gizmo in the position of, and matching radius of, the grounded collider
-        Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - GroundedOffset, transform.position.z), GroundedRadius);
+        if (Covered)
+        {
+            Gizmos.color = transparentBlue;
+            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - CoveredOffset, transform.position.z), CoveredRadius);
+        }
+        else
+        {
+            Gizmos.color = transparentRed;
+            Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - CoveredOffset, transform.position.z), CoveredRadius);
+        }
     }
 }

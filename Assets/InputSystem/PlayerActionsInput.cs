@@ -9,6 +9,8 @@ public class PlayerActionsInput : MonoBehaviour
     public bool Jump { get { return jump; } set { jump = value; } }
     [SerializeField] private bool sprint;
     public bool Sprint { get { return sprint; } set { sprint = value; } }
+    [SerializeField] private bool crounch;
+    public bool Crounch { get { return crounch; } set { crounch = value; } }
     [SerializeField] private Vector2 move;
     public Vector2 Move => move;
     [SerializeField] private Vector2 look;
@@ -26,6 +28,10 @@ public class PlayerActionsInput : MonoBehaviour
     public void OnSprint(InputValue value)
     {
         SprintInput(value.isPressed);
+    }
+    public void OnCrounch(InputValue value)
+    {
+        CrounchInput(value.isPressed);
     }
     public void OnMove(InputValue value)
     {
@@ -46,6 +52,10 @@ public class PlayerActionsInput : MonoBehaviour
     public void SprintInput(bool sprintState)
     {
         sprint = sprintState;
+    }
+    public void CrounchInput(bool crounchState)
+    {
+        crounch = crounchState;
     }
     private void MoveInput(Vector2 moveDirection)
     {
