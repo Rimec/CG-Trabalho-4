@@ -22,6 +22,8 @@ public class PlayerInputController : MonoBehaviour
     public float Height => height;
     [SerializeField] private float crounchHeight = 1.0f;
     public float CrounchHeight => crounchHeight;
+    [SerializeField] private float crounchJumpHeight = 0.8f;
+    public float CrounchJumpHeight => crounchJumpHeight;
 
     [Space(10)]
     [SerializeField] private float jumpHeight = 1.2f;
@@ -32,18 +34,18 @@ public class PlayerInputController : MonoBehaviour
     [Space(10)]
     [SerializeField] private float jumpTimeout = 0.1f;
     public float JumpTimeout => jumpTimeout;
-    [SerializeField] private float FallTimeout = 0.15f;
-    public float fallTimeout => fallTimeout;
+    [SerializeField] private float fallTimeout = 0.15f;
+    public float FallTimeout => fallTimeout;
 
     [Header("Player Grounded")]
     [SerializeField] private bool grounded = true;
     public bool Grounded { get { return grounded; } set { grounded = value; } }
     [SerializeField] private float groundedOffset = 0.75f;
     public float GroundedOffset => groundedOffset;
-    [SerializeField] private float GroundedRadius = 0.5f;
-    public float groundedRadius => GroundedRadius;
-    [SerializeField] private LayerMask GroundLayers;
-    public LayerMask groundLayers => GroundLayers;
+    [SerializeField] private float groundedRadius = 0.5f;
+    public float GroundedRadius => groundedRadius;
+    [SerializeField] private LayerMask groundLayers = 1;
+    public LayerMask GroundLayers => groundLayers;
 
     [Header("Player Covered")]
     [SerializeField] private bool covered = false;
@@ -52,7 +54,7 @@ public class PlayerInputController : MonoBehaviour
     public float CoveredOffset => coveredOffset;
     [SerializeField] private float coveredRadius = 0.5f;
     public float CoveredRadius => coveredRadius;
-    [SerializeField] private LayerMask coverLayers;
+    [SerializeField] private LayerMask coverLayers = 1;
     public LayerMask CoverLayers => coverLayers;
 
     [Header("Cinemachine")]
@@ -184,7 +186,6 @@ public class PlayerInputController : MonoBehaviour
     private void Crounch()
     {
         _playerCC.height = _playerActions.Crounch ? CrounchHeight : Covered ? CrounchHeight : Height;
-        // _playerCC.center = _playerActions.Crounch ? CrounchHeight*.5f : Height*.5f;
     }
 
     private void JumpAndGravity()
@@ -201,10 +202,14 @@ public class PlayerInputController : MonoBehaviour
             }
 
             // Jump
-            if (_playerActions.Jump && _jumpTimeoutDelta <= 0.0f)
+            if (!Covered)
             {
-                // the square root of H * -2 * G = how much velocity needed to reach desired height
-                _verticalVelocity = Mathf.Sqrt(JumpHeight * -2f * Gravity);
+                if (_playerActions.Jump && _jumpTimeoutDelta <= 0.0f)
+                {
+                    // the square root of H * -2 * G = how much velocity needed to reach desired height
+
+                    _verticalVelocity = _playerActions.Crounch ? (Mathf.Sqrt(CrounchJumpHeight * -2f * Gravity)) : (Mathf.Sqrt(JumpHeight * -2f * Gravity));
+                }
             }
 
             // jump timeout
