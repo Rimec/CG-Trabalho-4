@@ -288,4 +288,12 @@ public class PlayerInputController : MonoBehaviour
             Gizmos.DrawSphere(new Vector3(transform.position.x, transform.position.y - CoveredOffset, transform.position.z), CoveredRadius);
         }
     }
+
+    private void OnTriggerStay(Collider other)
+    {
+        if (_playerActions.OpenDoor)
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(1, UnityEngine.SceneManagement.LoadSceneMode.Single);
+        }
+    }
 }

@@ -7,6 +7,8 @@ public class PlayerActionsInput : MonoBehaviour
 {
     [SerializeField] private bool jump;
     public bool Jump { get { return jump; } set { jump = value; } }
+    [SerializeField] private bool openDoor;
+    public bool OpenDoor { get { return openDoor; } set { openDoor = value; } }
     [SerializeField] private bool sprint;
     public bool Sprint { get { return sprint; } set { sprint = value; } }
     [SerializeField] private bool crounch;
@@ -24,6 +26,10 @@ public class PlayerActionsInput : MonoBehaviour
     public void OnJump(InputValue value)
     {
         JumpInput(value.isPressed);
+    }
+    public void OnOpenDoor(InputValue value)
+    {
+        OpenDoorInput(value.isPressed);
     }
     public void OnSprint(InputValue value)
     {
@@ -48,6 +54,10 @@ public class PlayerActionsInput : MonoBehaviour
     public void JumpInput(bool jumpState)
     {
         jump = jumpState;
+    }
+    public void OpenDoorInput(bool openState)
+    {
+        openDoor = openState;
     }
     public void SprintInput(bool sprintState)
     {
